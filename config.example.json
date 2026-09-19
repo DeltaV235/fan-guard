@@ -1,4 +1,19 @@
 {
+  "_comments": {
+    "usage": "首次部署复制为 config.json，替换设备 UID 占位符；不要覆盖已有现场配置。JSON 不支持 // 注释，本 _comments 对象仅作说明，guard 不读取它，可保留或删除。",
+    "api_url": "CoolerControl API 地址。coolercontrol 是 Compose 服务名，通过 Docker 内部网络访问；沿用当前 Compose 时无需修改。",
+    "token_file": "guard 容器内的 API token 文件路径，不是 token 内容。由 Compose 单独只读挂载，不要把实际 token 写进此文件或提交 Git。",
+    "driver_path": "guard 容器内的驱动接口目录。包含 fan_control_status（状态）、fan_control_authorize（授权）、fan_control_watchdog（续租或写0回退）；不是 PVE 上的 hwmon 路径。",
+    "channels": "要保护的风扇通道列表。加入列表不强制软件接管：CoolerControl 选择未管理时仍可保持 BIOS 自动。当前实现每个 sidecar 只管理一个 NCT6687 芯片。",
+    "channels.device_uid": "CoolerControl API 中 NCT6687 整个设备的 UID，不是 hwmon3，也不是风扇名字。同一芯片上的 fan1、fan3、fan4 填写相同实际 UID。",
+    "channels.channel_name": "CoolerControl API 的通道名，例如 fan3；不要填界面自定义的显示名称。",
+    "channels.pwm": "驱动通道编号，3 对应 pwm3 和 pwm3_enable。必须与 channel_name 的实际硬件映射一致，不能仅根据名称猜接头。",
+    "channels.guard_mask": "guard 按位计算保护掩码：pwmN 对应 1 << (N-1)。本例 pwm1、pwm3、pwm4 合计13（0x0d），必须与 PVE guard_mask 一致；修改本文件不会自动修改驱动参数、udev 权限或 LXC/Docker 挂载。",
+    "required_sources": "明确要求始终健康的温度源，至少一个。手动固定转速和未管理状态下仍会检查；guard 还会检查风扇配置文件引用的温度源。自定义/组合传感器所依赖的必要物理温度源应在此明确列出。",
+    "required_sources.device_uid": "温度传感器所属设备的 CoolerControl UID，可以与风扇芯片 UID 不同；每个占位符按实际设备填写，同一温度设备的多个通道使用相同 UID。",
+    "required_sources.temp_name": "所属设备的温度通道名，例如 temp1；temp1 不天然表示 CPU 温度，须与 device_uid 一起确认。检查温度有效及设备状态时间戳推进，不要求温度数值不断变化。",
+    "not_configured_here": "此文件不定义曲线、手动转速、Mode 或恢复快照。曲线/转速在 CoolerControl 中设置，guard 自动保存通道设置快照。3秒检查、15秒租约等时间目前固定在源码中，不能在此调整。"
+  },
   "api_url": "http://coolercontrol:11987",
   "token_file": "/run/credentials/coolercontrol-api-token",
   "driver_path": "/guard",
