@@ -1,0 +1,28 @@
+{
+  "api_url": "http://coolercontrol:11987",
+  "token_file": "/run/credentials/coolercontrol-api-token",
+  "driver_path": "/guard",
+  "channels": [
+    {
+      "device_uid": "REPLACE_WITH_NCT6687_UID",
+      "channel_name": "fan1",
+      "pwm": 1
+    },
+    {
+      "device_uid": "REPLACE_WITH_NCT6687_UID",
+      "channel_name": "fan3",
+      "pwm": 3
+    },
+    {
+      "device_uid": "REPLACE_WITH_NCT6687_UID",
+      "channel_name": "fan4",
+      "pwm": 4
+    }
+  ],
+  "required_sources": [
+    {
+      "device_uid": "REPLACE_WITH_SOURCE_DEVICE_UID_1",
+      "temp_name": "temp1"
+    }
+  ]
+}

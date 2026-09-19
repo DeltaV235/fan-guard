@@ -1,0 +1,88 @@
+# Generated for pve-01 / LXC 131. Run start-fan-control.sh to resolve hwmon.
+services:
+  coolercontrol:
+    image: coolercontrol/coolercontrold
+    user: "0:0"
+    restart: on-failure
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: ["/tmp:rw,nosuid,nodev,noexec,size=32m"]
+    ports: ["11987:11987"]
+    volumes:
+      - type: bind
+        source: /sys
+        target: /sys
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: /opt/fan-control/pwm1
+        target: "@FAN_DEVICE@/pwm1"
+        bind: {create_host_path: false}
+      - type: bind
+        source: /opt/fan-control/pwm1_enable
+        target: "@FAN_DEVICE@/pwm1_enable"
+        bind: {create_host_path: false}
+      - type: bind
+        source: /opt/fan-control/pwm3
+        target: "@FAN_DEVICE@/pwm3"
+        bind: {create_host_path: false}
+      - type: bind
+        source: /opt/fan-control/pwm3_enable
+        target: "@FAN_DEVICE@/pwm3_enable"
+        bind: {create_host_path: false}
+      - type: bind
+        source: /opt/fan-control/pwm4
+        target: "@FAN_DEVICE@/pwm4"
+        bind: {create_host_path: false}
+      - type: bind
+        source: /opt/fan-control/pwm4_enable
+        target: "@FAN_DEVICE@/pwm4_enable"
+        bind: {create_host_path: false}
+      - type: volume
+        source: coolercontrol-config
+        target: /etc/coolercontrol
+    networks: [fan-control]
+  fan-guard:
+    build: ./fan-guard
+    image: local/fan-guard:review1
+    user: "0:0"
+    restart: on-failure
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: ["/tmp:rw,nosuid,nodev,noexec,size=32m"]
+    depends_on: [coolercontrol]
+    volumes:
+      - type: bind
+        source: ./config.json
+        target: /config/config.json
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ./coolercontrol-api-token
+        target: /run/credentials/coolercontrol-api-token
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: "/opt/fan-control/fan_control_watchdog"
+        target: /guard/fan_control_watchdog
+        bind: {create_host_path: false}
+      - type: bind
+        source: "/opt/fan-control/fan_control_authorize"
+        target: /guard/fan_control_authorize
+        bind: {create_host_path: false}
+      - type: bind
+        source: "/opt/fan-control/fan_control_status"
+        target: /guard/fan_control_status
+        read_only: true
+        bind: {create_host_path: false}
+      - type: volume
+        source: guard-state
+        target: /state
+    networks: [fan-control]
+networks:
+  fan-control: {}
+volumes:
+  coolercontrol-config: {}
+  guard-state: {}

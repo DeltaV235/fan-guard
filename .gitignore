@@ -1,0 +1,23 @@
+# Local deployment configuration and credentials
+/config.json
+/compose.yaml
+/compose.yaml.*
+/coolercontrol-api-token
+.env
+.env.*
+*.env
+secrets/
+credentials/
+*.key
+*.pem
+# Runtime state and generated files
+/state/
+attempts.json
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+._*
+.idea/
+*.bak
+*.bak-*

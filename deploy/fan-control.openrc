@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+description="CoolerControl and fan-guard with verified PVE hwmon mounts"
+depend() {
+    need docker
+    after localmount
+}
+start() {
+    ebegin "Starting fan-control after verifying PVE mounts"
+    /root/nas-app-data-docker/fan-control/start-fan-control.sh
+    eend $?
+}
+stop() {
+    ebegin "Stopping fan-control and returning fans to firmware"
+    (cd /root/nas-app-data-docker/fan-control && docker compose --env-file /dev/null -f compose.yaml stop fan-guard coolercontrol)
+    eend $?
+}
